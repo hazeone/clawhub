@@ -1,0 +1,104 @@
+name: morning-brief
+description: "买方晨会纪要全流程 — 自动获取隔夜数据、分析持仓影响、生成结构化晨报"
+version: 1.0.0
+
+schedule:
+  cron: "00 7 * * 1-5"
+  timezone: Asia/Shanghai
+  market_calendar: cn-a
+  skip_holidays: true
+  enabled: true
+
+params:
+  portfolio_source: "portfolio.csv"
+  benchmark: "000300.SH"
+  markets: [cn-a, hk, us]
+  language: zh-CN
+
+steps:
+  - id: fetch_market_data
+    skill: data-wind-equity
+    params:
+      scope: index_snapshot
+      indices:
+        - "000001.SH"   # 上证指数
+        - "399001.SZ"   # 深证成指
+        - "000300.SH"   # 沪深300
+        - "000905.SH"   # 中证500
+        - "399006.SZ"   # 创业板指
+        - "000688.SH"   # 科创50
+      fields: [close, pct_chg, volume, amt]
+    timeout: 60s
+
+  - id: fetch_hk_data
+    skill: data-wind-equity
+    params:
+      scope: index_snapshot
+      indices:
+        - "HSI.HI"       # 恒生指数
+        - "HSTECH.HI"    # 恒生科技
+      fields: [close, pct_chg, volume, amt]
+    timeout: 60s
+    parallel_with: fetch_market_data
+
+  - id: fetch_portfolio_prices
+    skill: data-wind-equity
+    params:
+      scope: portfolio_holdings
+      source: ${params.portfolio_source}
+      fields: [close, pct_chg, volume, amt, turn]
+    timeout: 120s
+    parallel_with: fetch_market_data
+
+  - id: fetch_macro
+    skill: data-macro-cn
+    params:
+      indicators: [PMI, CPI, PPI, shibor_3m, lpr_1y, lpr_5y]
+      check_calendar: true
+      days_ahead: 1
+    timeout: 60s
+    parallel_with: fetch_market_data
+
+  - id: scan_announcements
+    skill: data-exchange-announce
+    params:
+      scope: portfolio_holdings
+      source: ${params.portfolio_source}
+      since: last_trading_close
+      keywords: [业绩, 预告, 分红, 增持, 减持, 回购, 重组]
+    timeout: 120s
+    parallel_with: fetch_market_data
+
+  - id: calc_portfolio_impact
+    skill: indicator-return-metrics
+    depends_on: [fetch_portfolio_prices]
+    params:
+      calculation: portfolio_attribution
+      benchmark: ${params.benchmark}
+      window: [1, 5, 20]
+
+  - id: generate_brief
+    skill: report-morning-brief
+    depends_on:
+      - fetch_market_data
+      - fetch_hk_data
+      - calc_portfolio_impact
+      - fetch_macro
+      - scan_announcements
+    params:
+      template: standard
+      language: ${params.language}
+      sections:
+        - market_overview
+        - portfolio_impact
+        - macro_update
+        - announcements
+        - style_momentum
+        - risk_signals
+    timeout: 120s
+
+  - id: distribute
+    action: notify
+    depends_on: [generate_brief]
+    channels: [clawx_notification]
+    on_failure: alert

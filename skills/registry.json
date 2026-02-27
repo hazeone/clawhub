@@ -1,0 +1,196 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-02-27T12:13:22.673Z",
+  "skills_count": 5,
+  "skills": [
+    {
+      "slug": "data-wind-equity",
+      "version": "1.0.0",
+      "layer": "data",
+      "run_mode": "oneshot",
+      "markets": [
+        "cn-a",
+        "hk"
+      ],
+      "assets": [
+        "equity"
+      ],
+      "roles": [
+        "pm",
+        "researcher",
+        "trader",
+        "risk"
+      ],
+      "quality_level": "verified",
+      "display_name_zh": "Wind 股票数据获取",
+      "display_name_en": "Wind Equity Data",
+      "description": "指导 AI 如何通过 Wind 金融终端获取 A 股和港股股票数据。 覆盖行情数据、财务数据、估值数据、行业分类等核心数据集， 包含 Wind API (WindPy / REST) 的字段映射、参数说明和典型调用示例。",
+      "sha256": "eb5ededbbd2588b28605de65a579ee0584fbb8683483c4c755bb139142114662",
+      "timeout": 120
+    },
+    {
+      "slug": "indicator-return-metrics",
+      "version": "1.0.0",
+      "layer": "indicator",
+      "run_mode": "oneshot",
+      "markets": [
+        "*"
+      ],
+      "assets": [
+        "*"
+      ],
+      "roles": [
+        "pm",
+        "researcher",
+        "risk"
+      ],
+      "quality_level": "verified",
+      "display_name_zh": "收益风险指标计算",
+      "display_name_en": "Return & Risk Metrics",
+      "description": "定义和计算投资组合常用收益风险指标：Sharpe Ratio, Information Ratio, Sortino Ratio, Calmar Ratio, 年化收益率, 最大回撤。包含年化处理、 无风险利率选择、滚动窗口计算等实操细节。面向中国市场，默认使用 中债国债到期收益率作为无风险利率基准。",
+      "sha256": "5ae537b12bfdd5e2be0045fa7b29410d87b75b50b74d201295d743fda1d1035e",
+      "timeout": 300
+    },
+    {
+      "slug": "model-dcf-cn",
+      "version": "1.0.0",
+      "layer": "model",
+      "run_mode": "oneshot",
+      "markets": [
+        "cn-a",
+        "hk"
+      ],
+      "assets": [
+        "equity"
+      ],
+      "roles": [
+        "researcher",
+        "pm"
+      ],
+      "quality_level": "verified",
+      "display_name_zh": "DCF 估值模型 (A股适配)",
+      "display_name_en": "DCF Valuation Model (China)",
+      "description": "A 股适配的 DCF（现金流折现）估值模型。基于自由现金流 (FCFF/FCFE) 方法， 针对中国市场特点做了适配：使用 WACC 中国参数、A 股股权风险溢价、 中债收益率作为无风险利率，支持两阶段和三阶段增长模型。",
+      "sha256": "fbec4eaa132942c55c02e78466a526899aa4e3d6b53cac59e7e5e080ec3218f4",
+      "timeout": 600
+    },
+    {
+      "slug": "monitor-position-risk",
+      "version": "1.0.0",
+      "layer": "monitor",
+      "run_mode": "daemon",
+      "markets": [
+        "cn-a",
+        "hk"
+      ],
+      "assets": [
+        "equity",
+        "bond"
+      ],
+      "roles": [
+        "risk",
+        "pm"
+      ],
+      "quality_level": "verified",
+      "display_name_zh": "持仓风险监控",
+      "display_name_en": "Position Risk Monitor",
+      "description": "持仓风险实时监控守护进程。持续监控投资组合的风险指标， 包括单票集中度、行业偏离、VaR 突破、最大回撤预警等， 当风险指标触及阈值时自动告警。",
+      "sha256": "24d9d0d9b6ffb8c80b98e104d0feb566d42a2c112b3062f45564a69a10064ddf"
+    },
+    {
+      "slug": "report-morning-brief",
+      "version": "1.0.0",
+      "layer": "report",
+      "run_mode": "cron",
+      "markets": [
+        "cn-a",
+        "hk",
+        "us"
+      ],
+      "assets": [
+        "equity",
+        "bond",
+        "fund"
+      ],
+      "roles": [
+        "pm",
+        "researcher"
+      ],
+      "quality_level": "verified",
+      "display_name_zh": "每日晨会纪要",
+      "display_name_en": "Daily Morning Brief",
+      "description": "生成机构买方每日晨会纪要。自动汇总隔夜行情变动、持仓影响分析、 宏观数据更新、重要公告和事件提醒。输出结构化中文报告， 适用于投资组合经理和研究员的早盘前决策参考。",
+      "sha256": "ffe271def1f4485756cb557c6d1ac184fd0dfd2471d8236871c555765c357ff8",
+      "cron_schedule": "30 7 * * 1-5",
+      "timeout": 600
+    }
+  ],
+  "bundles": [
+    {
+      "id": "buy-side-equity-cn",
+      "name_zh": "买方 A 股权益研究",
+      "name_en": "Buy-Side China Equity Research",
+      "description_zh": "面向中国 A 股权益市场的买方投研工具包。包含 Wind 数据获取、估值指标、DCF 模型、因子分析、晨会纪要、持仓监控等核心能力。",
+      "description_en": "Buy-side toolkit for China A-share equity research. Includes Wind data, valuation, DCF model, factor analysis, morning briefs, and position monitoring.",
+      "icon": "chart-bar",
+      "skills": [
+        "data-wind-equity",
+        "data-wind-fund",
+        "data-eastmoney-api",
+        "data-tushare-market",
+        "data-exchange-announce",
+        "data-macro-cn",
+        "tool-excel-financial-model",
+        "tool-python-quant-env",
+        "indicator-return-metrics",
+        "indicator-risk-metrics",
+        "indicator-valuation",
+        "indicator-financial-quality",
+        "indicator-factor-barra",
+        "model-dcf-cn",
+        "model-comps-cn",
+        "model-multi-factor",
+        "model-risk-attribution",
+        "report-morning-brief",
+        "report-earnings-review",
+        "monitor-position-risk",
+        "monitor-announcement",
+        "backtest-factor-ic",
+        "backtest-strategy-pnl"
+      ],
+      "recommended": true
+    },
+    {
+      "id": "quant-researcher",
+      "name_zh": "量化研究员",
+      "name_en": "Quantitative Researcher",
+      "description_zh": "面向量化研究员的专业工具包。侧重因子研究、回测验证、多因子模型构建、行业轮动策略等系统化投资研究能力。",
+      "description_en": "Professional toolkit for quantitative researchers. Focused on factor research, backtesting, multi-factor model construction, and systematic investment research.",
+      "icon": "flask",
+      "skills": [
+        "data-wind-equity",
+        "data-tushare-market",
+        "data-macro-cn",
+        "tool-python-quant-env",
+        "indicator-return-metrics",
+        "indicator-risk-metrics",
+        "indicator-valuation",
+        "indicator-financial-quality",
+        "indicator-technical",
+        "indicator-factor-barra",
+        "indicator-factor-custom",
+        "indicator-liquidity",
+        "model-multi-factor",
+        "model-risk-attribution",
+        "model-portfolio-optimize",
+        "model-event-study",
+        "model-sector-rotation",
+        "model-macro-regime",
+        "backtest-factor-ic",
+        "backtest-strategy-pnl",
+        "monitor-factor-decay"
+      ],
+      "recommended": false
+    }
+  ]
+}

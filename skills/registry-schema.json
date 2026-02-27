@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ClawX Financial Skills Registry",
+  "type": "object",
+  "required": ["version", "generated_at", "skills_count", "skills"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Registry schema version"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "skills_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "skills": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/SkillEntry" }
+    },
+    "bundles": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/BundleEntry" }
+    }
+  },
+  "$defs": {
+    "SkillEntry": {
+      "type": "object",
+      "required": ["slug", "version", "layer", "run_mode", "markets", "assets", "description"],
+      "properties": {
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]+$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "layer": {
+          "enum": ["data", "tool", "indicator", "backtest", "model", "monitor", "report", "compliance"]
+        },
+        "run_mode": {
+          "enum": ["oneshot", "daemon", "cron"]
+        },
+        "markets": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "assets": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "roles": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "quality_level": {
+          "enum": ["verified", "reviewed", "community"]
+        },
+        "display_name_zh": { "type": "string" },
+        "display_name_en": { "type": "string" },
+        "description": { "type": "string" },
+        "sha256": { "type": "string" },
+        "cron_schedule": { "type": "string" },
+        "timeout": { "type": "integer" },
+        "depends_on_skills": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "BundleEntry": {
+      "type": "object",
+      "required": ["id", "name_zh", "skills"],
+      "properties": {
+        "id": { "type": "string" },
+        "name_zh": { "type": "string" },
+        "name_en": { "type": "string" },
+        "description_zh": { "type": "string" },
+        "description_en": { "type": "string" },
+        "icon": { "type": "string" },
+        "skills": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "recommended": { "type": "boolean" }
+      }
+    }
+  }
+}
